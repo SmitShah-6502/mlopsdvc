@@ -1,0 +1,41 @@
+stages:
+  data_ingestion:
+    cmd: python mlopsdvc/src/data/data_ingestion.py
+    deps:
+    - mlopsdvc/src/data/data_ingestion.py
+    outs:
+    - data/raw/test.csv
+    - data/raw/train.csv
+  data_preprocessing:
+    cmd: python mlopsdvc/src/data/data_preprocessing.py
+    deps:
+    - data/raw/test.csv
+    - data/raw/train.csv
+    - mlopsdvc/src/data/data_preprocessing.py
+    outs:
+    - data/processed/test.csv
+    - data/processed/train.csv
+  feature_engineering:
+    cmd: python mlopsdvc\src\features\feature_engg.py
+    deps:
+    - data/processed/test.csv
+    - data/processed/train.csv
+    - mlopsdvc/src/features/feature_engg.py
+    outs:
+    - data/interim/test_bow.csv
+    - data/interim/train_bow.csv
+  model_training:
+    cmd: python mlopsdvc/src/models/modelling.py
+    deps:
+    - data/interim/train_bow.csv
+    - mlopsdvc/src/models/modelling.py
+    outs:
+    - mlopsdvc/src/models/random_forest_model.pkl
+  model_evaluation:
+    cmd: python mlopsdvc/src/models/model_evaluation.py
+    deps:
+    - data/interim/test_bow.csv
+    - mlopsdvc/src/models/model_evaluation.py
+    - mlopsdvc/src/models/random_forest_model.pkl
+    outs:
+    - mlopsdvc/reports/metrics.json
